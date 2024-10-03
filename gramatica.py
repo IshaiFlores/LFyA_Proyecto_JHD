@@ -98,8 +98,10 @@ class Parsed:
                     return f"Error de formato en la fila {numero_fila}, cerca de la columna {columna_error}: se esperaba un intervalo válido separado por '..'"
 
             elif '.' in parte:
-                columna_error = linea_error.find(parte) + 1
-                return f"Error de formato en la fila {numero_fila}, cerca de la columna {columna_error}: se esperaba '..' en lugar de '.' para definir un intervalo"
+
+                if not (parte.startswith("'") and parte.endswith("'")):
+                    columna_error = linea_error.find(parte) + 1
+                    return f"Error de formato en la fila {numero_fila}, cerca de la columna {columna_error}: se esperaba '..' en lugar de '.' para definir un intervalo"
 
             elif parte.startswith("'") and parte.endswith("'"):
                 if len(parte) != 3:

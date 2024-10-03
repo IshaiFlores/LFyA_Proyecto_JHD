@@ -130,6 +130,11 @@ def main ():
                                 print(f"Error de formato en la linea {numero_fila}, cerca de la columna {columna_error}: se esperaba la funcion 'RESERVADAS()' en ACTIONS")
                                 break
 
+                            elif f_activa == True:
+                                columna_error = 1
+                                print(f"Error de formato en la linea {numero_fila}, cerca de la columna {columna_error}: se esperaba el cierre de la función activa")
+                                break
+
                             seccion_ACTIONS = False #Desactiva la seccion de ACTIONS
                             seccion_ERROR = True #Activa la seccion de ERROR
                             secciones[3] = True #Valida si la seccion de ERROR estuvo presente
@@ -178,19 +183,27 @@ def main ():
 
                                     #Si hay una función ya activa y viene un simbolo que no es ni una llave
                                     if f_activa:
-                                        columna_error = 1
-                                        print(f"Error de formato en la linea {numero_fila}, cerca de la columna {columna_error}: se esperaba una llave de apertura '{'{'}'")
+                                        if llave_abierta == True:
+                                            columna_error = 1
+                                            print(f"Error de formato en la linea {numero_fila}, cerca de la columna {columna_error}: se esperaba por lo menos un espacio vacío")
+                                            break
+
+                                        else: #Si ya se encontró la llave de apertura
+                                            columna_error = 1
+                                            print(f"Error de formato en la linea {numero_fila}, cerca de la columna {columna_error}: se esperaba una llave de apertura '{'{'}'")
+                                            break
 
                                     if '(' not in linea:#Si no se encuentra un paréntesis abierto "("
-                                        columna_error = len(linea_error)
+                                        columna_error = len(linea_error) + 1
                                         print(f"Error de formato en la linea {numero_fila}, cerca de la columna {columna_error}: se esperaba un parentesis abierto '('")
+                                        break
 
                                     #Se divide la cadena a partir del paréntesis abierto "("
                                     partes = linea.split('(')
 
-                                    #Si la división no es exactamente en dos partes, significa que hay más de un paréntesis abierto
+                                    #Si la división no es exactamente en dos partes, significa que hay más de un paréntesis abierto o no hay un paréntesis abierto
                                     if len(partes) != 2:
-                                        columna_error = linea_error.rfind('(')
+                                        columna_error = len(linea_error) + 1
                                         print(f"Error de formato en la linea {numero_fila}, cerca de la columna {columna_error}: se esperaba un solo parentesis abierto '('")
                                         break
 
@@ -206,17 +219,18 @@ def main ():
 
                                     #Si no hay paréntesis de cierre
                                     if not cierre == ')':
-                                        columna_error = linea_error.find(cierre)
+                                        columna_error = len(linea_error) + 1
                                         print(f"Error de formato en la linea {numero_fila}, cerca de la columna {columna_error}: se esperaba un parentesis de cierre ')'")
                                         break
 
                                     #Valida que la declaración de una función está activa
                                     f_activa = True
+                                    continue
 
                             else:#Si no concuerda con ninguna cadena
                                 columna_error = 1
                                 print(f"Error de formato en la linea {numero_fila}, se esperaba un titulo de una seccion como 'TOKENS' o 'ACTIONS")
-
+                                break
 
                     #Elimina los espacios que se encuentren la línea
                     linea = eliminar_espacios(linea)
@@ -274,7 +288,6 @@ def main ():
                         validacion = parseo.validar_ACTIONS(linea, numero_fila,linea_error)
 
 
-
                         #Si la línea tiene un error de formato
                         if validacion != "Formato valido":
                             #Imprime el error encontrado
@@ -303,6 +316,7 @@ def main ():
                             #Imprime el error encontrado
                             print(validacion)
                             break;
+
                         else:
 
                         #Si la línea tiene un formato correcto, pasa a la siguiente línea del archivo .txt
@@ -312,11 +326,13 @@ def main ():
                     if secciones[1] == False: #Si en el archivo no se encontró ninguna sección válida
                         columna_error = 1
                         print(f"Error de formato: el archivo no sigue ninguna de las reglas establecidas")
+                        break
 
                     elif secciones[3] == False:#Si no se encontró la sección ERROR
                         #Muestra error
                         columna_error = 1
                         print(f"Error de formato en la linea {numero_fila}, cerca de la columna {columna_error}: se esperaba por lo menos un 'ERROR'")
+                        break
 
                     else:
                         #Imprime la validación de que el formato del archivo .txt estuvo correcto
