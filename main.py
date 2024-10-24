@@ -1,5 +1,12 @@
 from gramatica import Parsed
+from collections import defaultdict
 import os
+from tree_moore import Tree_Moore
+from tree_moore import calculate_transitions
+from tree_moore import print_transitions
+from tree_moore import write_transitions_to_csv
+
+
 
 def eliminar_espacios(linea):
     # Reemplaza todos los espacios en blanco en una línea
@@ -9,6 +16,8 @@ def eliminar_espacios(linea):
 
 # Inicializa la instancia de la clase que manejará la validación de las secciones
 parseo = Parsed()
+
+tree = Tree_Moore()
 
 def main ():
 
@@ -33,7 +42,11 @@ def main ():
         #Flags para manejo de llaves, funciones activas y el control de RESERVADAS
         llave_abierta = False  #Verifica si la llave de apertura { ya fue encontrada
         f_reservadas = False  #Verificar si RESERVADAS() ya fue encontrada
-        f_activa = False #Verifica si se encuentra una funcion activa para
+        f_activa = False #Verifica si se encuentra una funcion activa pendiente de cierre
+
+
+        Tokens = []
+
 
         filepath = input("Ingrese la ruta del archivo a leer: ")
 
@@ -264,7 +277,7 @@ def main ():
 
                         else:
                             #Valida la sección TOKENS
-                            validacion = parseo.validar_TOKENS(linea,numero_fila,linea_error)
+                            validacion, expresion = parseo.validar_TOKENS(linea,numero_fila,linea_error)
 
                             #Si la línea tiene un error de formato
                             if validacion != "Formato valido":
@@ -273,6 +286,10 @@ def main ():
                                 break;
 
                             else:
+                                print(expresion)
+                                Tokens.append(expresion)
+
+
                             #Si la línea tiene un formato correcto, pasa a la siguiente línea del archivo .txt
                                 continue
 
@@ -295,6 +312,8 @@ def main ():
                             break;
 
                         else:
+
+
                         #Si la línea tiene un formato correcto, pasa a la siguiente línea del archivo .txt
                             continue
 
@@ -336,7 +355,32 @@ def main ():
 
                     else:
                         #Imprime la validación de que el formato del archivo .txt estuvo correcto
+
+                        er = tree.Make_Tokens(Tokens)
+
+                        root = tree.Moore_tree(er)
+
+                        followers = defaultdict(set)
+
+                        tree.calculate_followers(root,followers)
+
+                        print("Se creó el archivo de First, Last y Nullable")
+                        tree.print_table_csv(root)
+
+                        # Mostrar la tabla de FOLLOWERS
+                        print("Se creó el archivo de Follows")
+                        tree.print_followers_table(followers, 'follows.csv')
+
+                        leaves = tree.collect_leaves_data(root)
+
+                        # Mostrar la tabla de FOLLOWERS
+                        print("Se creó el archivo de Transiciones")
+                        write_transitions_to_csv(root,followers,leaves,'transitions.csv')
+
+
                         print ("Formato correcto")
+
+
 
         except FileNotFoundError:
             print ("el archivo no existe, intente de nuevo")

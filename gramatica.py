@@ -1,4 +1,6 @@
 
+
+
 class Parsed:
 
     def validar_SET(self, linea, numero_fila, linea_error):
@@ -165,6 +167,7 @@ class Parsed:
         # Se recorre la línea para encontrar el primer '=' que no esté entre comillas simples
         dentro_comillas = False
         posicion_igual = -1  # Guardará la posición del primer '=' encontrado fuera de comillas
+        posicion_igual_token = -1
 
         for idx, char in enumerate(linea):
 
@@ -174,6 +177,8 @@ class Parsed:
             elif char == '=' and not dentro_comillas:#Sino se guarda la posición donde se encontró el primer '=' fuera de comillas
                 posicion_igual = idx
                 break  # Nos detenemos al encontrar el primer '=' fuera de comillas
+
+
 
 
         #Se muestra error sino se encontró un '=' que no sea un símbolo terminal
@@ -284,7 +289,32 @@ class Parsed:
             columna_error = len(linea_error) + 1
             return f"Error de formato en la fila {numero_fila}, cerca de la columna {columna_error}: Falta cerrar {'paréntesis' if stack[-1] == '(' else 'llave'}"
 
-        return "Formato valido"
+
+        linea_token = linea_error.strip()
+
+        dentro_comillas = False
+
+        for idx, char in enumerate(linea_token):
+
+            if char == "'":  # Cambiamos el estado si encontramos una comilla simple
+                dentro_comillas = not dentro_comillas
+
+            elif char == '=' and not dentro_comillas:#Sino se guarda la posición donde se encontró el primer '=' fuera de comillas
+                posicion_igual_token = idx
+                break  # Nos detenemos al encontrar el primer '=' fuera de comillas
+
+
+        token = linea_token[posicion_igual_token + 1:].strip()
+
+        moore = f"#TOKEN{token_num}"
+
+        token_limpio = "(" + token + ") " + moore + "|"
+
+        return "Formato valido", token_limpio
+
+
+
+
 
 
     def validar_ACTIONS(self, linea, numero_fila, linea_error):
