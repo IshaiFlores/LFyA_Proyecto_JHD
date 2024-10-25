@@ -2,9 +2,7 @@ from gramatica import Parsed
 from collections import defaultdict
 import os
 from tree_moore import Tree_Moore
-from tree_moore import calculate_transitions
-from tree_moore import print_transitions
-from tree_moore import write_transitions_to_csv
+
 
 
 
@@ -354,6 +352,7 @@ def main ():
                         break
 
                     else:
+
                         #Imprime la validación de que el formato del archivo .txt estuvo correcto
 
                         er = tree.Make_Tokens(Tokens)
@@ -364,7 +363,6 @@ def main ():
 
                         tree.calculate_followers(root,followers)
 
-                        print("Se creó el archivo de First, Last y Nullable")
                         tree.print_table_csv(root)
 
                         # Mostrar la tabla de FOLLOWERS
@@ -375,7 +373,7 @@ def main ():
 
                         # Mostrar la tabla de FOLLOWERS
                         print("Se creó el archivo de Transiciones")
-                        write_transitions_to_csv(root,followers,leaves,'transitions.csv')
+                        tree.write_transitions_to_csv(root,followers,leaves,'transitions.csv')
 
 
                         print ("Formato correcto")

@@ -290,8 +290,8 @@ class Parsed:
             return f"Error de formato en la fila {numero_fila}, cerca de la columna {columna_error}: Falta cerrar {'paréntesis' if stack[-1] == '(' else 'llave'}"
 
 
+        # Procesar el token limpio y generar la expresión con el formato Moore
         linea_token = linea_error.strip()
-
         dentro_comillas = False
 
         for idx, char in enumerate(linea_token):
