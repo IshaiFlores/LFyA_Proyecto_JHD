@@ -303,12 +303,28 @@ class Parsed:
                 posicion_igual_token = idx
                 break  # Nos detenemos al encontrar el primer '=' fuera de comillas
 
-
         token = linea_token[posicion_igual_token + 1:].strip()
 
-        moore = f"#TOKEN{token_num}"
+        if "{ RESERVADAS() }" in linea_token:
 
-        token_limpio = "(" + token + ") " + moore + "|"
+            for idx, char in enumerate(token):
+
+                if char == "{":  # Cambiamos el estado si encontramos una comilla simple
+                    posicion_llave_token = idx
+
+            token = token[:posicion_llave_token].strip()
+
+            moore = f"#RESERVADAS{token_num}"
+
+            token_limpio = "(" + token + ") " + moore + "|"
+
+        else:
+
+            moore = f"#TOKEN{token_num}"
+
+            token_limpio = "(" + token + ") " + moore + "|"
+
+
 
         return "Formato valido", token_limpio
 
@@ -318,6 +334,8 @@ class Parsed:
 
 
     def validar_ACTIONS(self, linea, numero_fila, linea_error):
+
+
 
         # Paso 1: Verificar el formato general (identificador seguido de '=')
         linea = linea.strip()  # Elimina espacios en blanco al principio y al final de la línea
@@ -363,7 +381,11 @@ class Parsed:
                 columna_error = linea_error.find(contenido_interno) + 1  # Error dentro del contenido
                 return f"Error de formato en la fila {numero_fila}, cerca de la columna {columna_error}: se esperaba solo letras mayúsculas"
 
-        return "Formato valido"
+
+        Action = (identificador,contenido)
+
+
+        return "Formato valido", Action
 
 
 

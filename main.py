@@ -2,7 +2,7 @@ from gramatica import Parsed
 from collections import defaultdict
 import os
 from tree_moore import Tree_Moore
-
+from scanner import ExpressionScanner
 
 
 
@@ -44,7 +44,7 @@ def main ():
 
 
         Tokens = []
-
+        Actions = []
 
         filepath = input("Ingrese la ruta del archivo a leer: ")
 
@@ -284,7 +284,6 @@ def main ():
                                 break;
 
                             else:
-                                print(expresion)
                                 Tokens.append(expresion)
 
 
@@ -300,7 +299,7 @@ def main ():
                             continue
 
                         #Valida la sección ACTIONS
-                        validacion = parseo.validar_ACTIONS(linea, numero_fila,linea_error)
+                        validacion, action = parseo.validar_ACTIONS(linea, numero_fila,linea_error)
 
 
                         #Si la línea tiene un error de formato
@@ -311,7 +310,7 @@ def main ():
 
                         else:
 
-
+                            Actions.append(action)
                         #Si la línea tiene un formato correcto, pasa a la siguiente línea del archivo .txt
                             continue
 
@@ -373,10 +372,41 @@ def main ():
 
                         # Mostrar la tabla de FOLLOWERS
                         print("Se creó el archivo de Transiciones")
-                        tree.write_transitions_to_csv(root,followers,leaves,'transitions.csv')
-
+                        transitions = tree.write_transitions_to_csv(root,followers,leaves,'transitions.csv')
 
                         print ("Formato correcto")
+
+                        input("Presione cualquier tecla para continuar")
+
+                        os.system("cls")
+
+                        exit = False
+
+                        while(exit != True):
+
+                            sentence = input("Ingrese la expresion a escanear\n>")
+
+                            ExpressionScanner(sentence,transitions,Actions,leaves,root)
+
+                            while True:
+
+                                op1 = input("¿Desea ingresar otra expresión? (Y/N): ")
+
+                                if op1.upper() == "Y":
+                                    os.system("cls")
+                                    break  # Rompe el bucle actual para continuar en el bucle externo
+
+                                elif op1.upper() == "N":
+                                    os.system("cls")
+                                    exit = True  # Indica que se debe salir del bucle externo
+                                    break  # Rompe el bucle actual
+
+                                else:
+                                    input("Error, ingrese una opción válida")
+                                    os.system("cls")
+
+
+
 
 
 
@@ -386,17 +416,24 @@ def main ():
         except IOError:
             print("No se puede acceder al archivo, intente de nuevo")
 
+
+
         op = input("¿Desea leer otro archivo? Y/N (Y = si / N = no) \n")
 
-        if op == "Y":
+        if op.upper() == "Y":
 
             os.system('cls')
 
             continue
 
-        elif op == "N":
+        elif op.upper() == "N":
 
             break
+
+
+
+
+
 
 
 

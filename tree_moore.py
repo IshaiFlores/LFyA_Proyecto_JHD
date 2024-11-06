@@ -539,6 +539,10 @@ class Tree_Moore():
 
     # Función para escribir las transiciones en un archivo CSV
     # Genera un archivo CSV con las transiciones de estados entre símbolos
+    import csv
+
+    # Función para escribir las transiciones en un archivo CSV
+    # Genera un archivo CSV con las transiciones de estados entre símbolos
     def write_transitions_to_csv(self, root, followers, leaves, filename):
         transitions = self.calculate_transitions(followers, root, leaves)
         symbols = self.get_unique_symbols(leaves)  # Obtenemos los símbolos únicos
@@ -559,10 +563,26 @@ class Tree_Moore():
                 # Añadimos el siguiente estado para cada símbolo
                 for symbol in symbols:
                     next_state = sorted(trans.get(symbol, []))  # Obtenemos el siguiente estado o lista vacía
-                    row.append(next_state)
+
+                    # Verificamos si en el estado actual hay un número que representa un token de la forma "#TOKEN{num}"
+                    token_accepted = None
+                    # Verificamos si en el estado actual hay un número que representa un token de la forma "TOKEN{num}"
+                    for num in state:
+                        if symbol.startswith("#") and num in leaves.get(symbol, set()):
+                            token_accepted = f"{symbol} aceptado"
+                            break
+
+                    # Añadimos el token aceptado solo si no existe otra transición (next_state vacío)
+                    if token_accepted and not next_state:
+                        row.append(token_accepted)
+                    else:
+                        row.append(next_state)  # Si hay una transición, añadimos esa en lugar del token aceptado
 
                 # Escribimos la fila en el archivo CSV
                 writer.writerow(row)
+
+        return transitions
+
 
 
 
