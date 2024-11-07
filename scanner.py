@@ -15,12 +15,11 @@ def ExpressionScanner(expression, transiciones, actions, leaves, root):
         char = list_expression[idx]
         quoted_char = f"'{char}'"  # Encierran el símbolo entre comillas para compararlo en transiciones
 
-        if char == " " and complete == True:
+        if char == " " and complete:
             idx += 1
             continue
 
-        elif char != " " and complete == True:
-
+        elif char != " " and complete:
             complete = False
 
         # Determina el tipo de símbolo actual (LETRA, DIGITO o CHARSET)
@@ -51,36 +50,35 @@ def ExpressionScanner(expression, transiciones, actions, leaves, root):
 
         # Cuando no hay más transiciones, intentamos detectar el token
         if complete:
-            expression_dictionary = TokenAnalysis(cadena_acumulada, current_state, leaves, expression_dictionary,actions)
+            result = TokenAnalysis(cadena_acumulada, current_state, leaves, expression_dictionary, actions)
 
-            # Usamos TokenAnalysis para registrar el token detectado
-            if expression_dictionary is not None:
+            if result is not None:
                 # Reinicia la cadena acumulada y vuelve al estado inicial para continuar
                 cadena_acumulada = ""
                 current_state = initial_state
                 complete = True  # Restablece el indicador de completitud
             else:
-                # No encontramos transición ni token, marcamos error
-                print(f"Error: Simbolo {char} no coincide con ningún Token.")
-                return None
+                # Si no hay transición ni token válido, guarda el error en el diccionario y continúa
+                expression_dictionary[cadena_acumulada] = "Error: Token inválido"
+                cadena_acumulada = ""
+                current_state = initial_state
+                complete = True
+                idx += 1  # Avanzamos al siguiente carácter para continuar el análisis
 
     # Realiza un último análisis de token para la cadena acumulada final
     if cadena_acumulada:
-        expression_dictionary = TokenAnalysis(cadena_acumulada, current_state, leaves, expression_dictionary,actions)
+        result = TokenAnalysis(cadena_acumulada, current_state, leaves, expression_dictionary, actions)
 
-        if expression_dictionary is None:
-            # No encontramos transición ni token, marcamos error
-            print(f"Error: Simbolo '{cadena_acumulada[-1]}' no coincide con ningún Token.")
-            return None
+        if result is None:
+            # Si no hay transición ni token válido, guarda el error en el diccionario
+            expression_dictionary[cadena_acumulada] = "Error: Token inválido"
 
-        # Al final de ExpressionScanner, después de retornar el diccionario
-    if expression_dictionary:
-        print("TOKENS encontrados:")
-        for symbol, token in expression_dictionary.items():
-            print(f"{symbol} = {token}")
+    # Imprime cada símbolo con su respectivo token en una línea separada
+    print("TOKENS encontrados:")
+    for symbol, token in expression_dictionary.items():
+        print(f"{symbol} = {token}")
 
-
-
+    return expression_dictionary
 
 
 def TokenAnalysis(token, current_state, leaves, expression_dictionary, actions):
@@ -102,15 +100,12 @@ def TokenAnalysis(token, current_state, leaves, expression_dictionary, actions):
                             token_detectado = True
                             break
 
-                    if token_detectado != True:
-
+                    if not token_detectado:
                         number = Find_Number(symbol)
                         expression_dictionary[token] = f"TOKEN{number}"
                         token_detectado = True
 
-
-
-                if token_detectado != True:
+                if not token_detectado:
                     # Si es un símbolo de otro tipo, lo guarda directamente
                     expression_dictionary[token] = symbol[1:]
                     token_detectado = True
@@ -123,10 +118,8 @@ def TokenAnalysis(token, current_state, leaves, expression_dictionary, actions):
 
 
 def Find_Number(symbol):
-
     for i, char in enumerate(symbol):
         if char.isdigit():
             numero = symbol[i:]
             break
-
     return numero
