@@ -245,6 +245,7 @@
   ('random',
    'C:\\Users\\Ishai\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\random.py',
    'PYMODULE'),
+  ('scanner', 'C:\\Users\\Ishai\\LFyA pt1 Proyecto\\scanner.py', 'PYMODULE'),
   ('selectors',
    'C:\\Users\\Ishai\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\selectors.py',
    'PYMODULE'),
